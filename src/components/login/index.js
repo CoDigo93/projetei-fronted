@@ -16,6 +16,7 @@ const login = () => {
   const [erro, _] = useState('')
   const [hasError, setHasError] = useState(false)
   const [isHelping, setIsHelping] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const history = useHistory()
 
@@ -33,6 +34,7 @@ const login = () => {
 
   const handleSubmit = async (event) =>{
     event.preventDefault()
+    setIsLoading(true)
 
     const data = {
       username,
@@ -40,15 +42,16 @@ const login = () => {
     }
     
     try{
-      const response = await api.post('/autenticar', data)
+      const response = await api.post('/autenticar', data).then(setIsLoading(true))
 
       localStorage.setItem('token',response.data.token);
       console.log(response)
 
       history.push('/')
     }catch(error){
-      const erro = error.response.data.error
+      const erro = error
       setHasError(true)
+      setIsLoading(false)
       
     }
     
@@ -100,7 +103,7 @@ const login = () => {
                 : '' 
               }
 
-          <button onClick={handleSubmit} type="submit">Entrar</button>
+          <button onClick={handleSubmit} type="submit">{!isLoading ? 'Entrar' : 'Loading...'}</button>
           </form>
          
          <footer>
